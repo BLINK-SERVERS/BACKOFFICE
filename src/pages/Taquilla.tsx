@@ -28,8 +28,8 @@ export function Taquilla({ token, alVencer }: Props) {
     setExito("");
 
     const serialLimpio = serial.trim().toUpperCase();
-    if (!/^\d{2}-\d-\d{6}-\d$/.test(serialLimpio)) {
-      setError("El serial tiene el formato 23-1-000123-4.");
+    if (!/^\d{2}-\d-\d{6,7}-\d$/.test(serialLimpio)) {
+      setError("El serial tiene el formato 23-1-0000123-4.");
       return;
     }
     if (cedula.length < 6) {
@@ -87,7 +87,7 @@ export function Taquilla({ token, alVencer }: Props) {
               etiqueta="Serial"
               valor={serial}
               onChange={(v) => setSerial(v.toUpperCase())}
-              placeholder="23-1-000123-4"
+              placeholder="23-1-0000123-4"
             />
             <Campo
               id="cedula-taquilla"

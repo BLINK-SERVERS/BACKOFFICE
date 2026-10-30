@@ -95,8 +95,8 @@ export function Estacion({ token, alVencer }: Props) {
     const serialLimpio = serial.trim().toUpperCase();
     const uidLimpio = (uidManual || uidVivo).trim().toUpperCase();
 
-    if (!/^\d{2}-\d-\d{6}-\d$/.test(serialLimpio)) {
-      setError("El serial impreso tiene el formato 23-1-000123-4.");
+    if (!/^\d{2}-\d-\d{6,7}-\d$/.test(serialLimpio)) {
+      setError("El serial impreso tiene el formato 23-1-0000123-4.");
       return;
     }
     if (!/^[0-9A-F]{8,20}$/.test(uidLimpio)) {
@@ -208,7 +208,7 @@ export function Estacion({ token, alVencer }: Props) {
             etiqueta="Serial impreso"
             valor={serial}
             onChange={(v) => setSerial(v.toUpperCase())}
-            placeholder="23-1-000123-4"
+            placeholder="23-1-0000123-4"
             pista="Escanea el Code 128 o escríbelo a mano."
           />
           <Campo

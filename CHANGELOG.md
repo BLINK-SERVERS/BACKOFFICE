@@ -5,6 +5,19 @@ Todos los cambios notables de este repositorio se documentan aquí.
 El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y
 el versionado [SemVer](https://semver.org/lang/es/).
 
+## [1.1.0] — 2026-10-30
+
+### Cambiado
+
+- La estación y la taquilla aceptan seriales de la serie nueva de siete dígitos
+  (`23-1-0000123-4`) además de la heredada de seis (`23-1-000123-4`), en el
+  mensaje de error y en el marcador del campo.
+
+### Dependencias
+
+- Requiere la migración `0009_serie_siete_digitos.sql` para generar y enrolar la
+  serie nueva desde el panel.
+
 ## [1.0.0] — 2026-10-29
 
 ### Añadido
