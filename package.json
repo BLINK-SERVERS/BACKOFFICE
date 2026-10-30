@@ -1,0 +1,27 @@
+{
+  "name": "blink-backoffice",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "BLINK BACK-OFFICE — consola corporativa de lotes, estación de asignación y taquilla.",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "deploy": "npm run build -- --base=/BACKOFFICE/ && gh-pages -d dist -t"
+  },
+  "dependencies": {
+    "bwip-js": "^4.11.4",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "@vitejs/plugin-react": "^6.1.2",
+    "gh-pages": "^6.3.0",
+    "typescript": "^5.9.0",
+    "vite": "^8.3.5"
+  }
+}
