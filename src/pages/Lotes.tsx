@@ -37,8 +37,9 @@ const ESTADOS = [
   { valor: "25", texto: "25 · Delta Amacuro" },
 ];
 
-export function Lotes({ token, alVencer, alAbrirInventario }: Props) {
-  const [cantidad, setCantidad] = useState("100");
+const numeroLote = (numero: string | number) => String(numero).padStart(5, "0");
+
+export function Lotes({ token, alVencer, alAbrirInventario }: Props) {  const [cantidad, setCantidad] = useState("100");
   const [patrocinante, setPatrocinante] = useState("");
   const [estado, setEstado] = useState("23");
   const [tarifa, setTarifa] = useState("1");
@@ -74,8 +75,8 @@ export function Lotes({ token, alVencer, alAbrirInventario }: Props) {
     setCreado(null);
 
     const n = Number(cantidad);
-    if (!Number.isInteger(n) || n < 1 || n > 20000) {
-      setError("La cantidad debe estar entre 1 y 20.000 tarjetas.");
+    if (!Number.isInteger(n) || n < 1 || n > 999) {
+      setError("La cantidad debe estar entre 1 y 999 tarjetas (una unidad por número de 3 dígitos).");
       return;
     }
 
@@ -101,7 +102,7 @@ export function Lotes({ token, alVencer, alAbrirInventario }: Props) {
 
   const exportar = () => {
     if (!creado) return;
-    descargarCsv(`lote-${creado.lote.numero}`, [
+    descargarCsv(`lote-${numeroLote(creado.lote.numero)}`, [
       ["serial", "codigo_barras", "estado", "lote", "patrocinante"],
       ...creado.tarjetas.map((t) => [
         t.serial,
@@ -130,8 +131,8 @@ export function Lotes({ token, alVencer, alAbrirInventario }: Props) {
       <section className="seccion">
         <h2>Nuevo lote</h2>
         <p className="seccion__nota">
-          Los seriales se generan con dígito verificador Luhn para validar el plástico en la
-          estación.
+          Los seriales siguen la serie <span className="mono">T-LLLLL-UUU-V</span>: tarifa, lote de
+          5 dígitos, unidad de 3 dígitos y letra verificadora (Luhn mod 23).
         </p>
         <form onSubmit={generar}>
           <div className="fila-campos">
@@ -142,7 +143,7 @@ export function Lotes({ token, alVencer, alAbrirInventario }: Props) {
               onChange={setCantidad}
               tipo="number"
               min={1}
-              max={20000}
+              max={999}
             />
             <Campo
               id="patrocinante"
@@ -183,7 +184,7 @@ export function Lotes({ token, alVencer, alAbrirInventario }: Props) {
         {creado ? (
           <div style={{ marginTop: 20 }}>
             <Aviso tipo="ok">
-              Lote <strong>{creado.lote.numero}</strong> creado con{" "}
+              Lote <strong>{numeroLote(creado.lote.numero)}</strong> creado con{" "}
               {entero(creado.lote.cantidad)} tarjetas, de{" "}
               <span className="mono">{creado.lote.desde}</span> a{" "}
               <span className="mono">{creado.lote.hasta}</span>.
@@ -229,7 +230,7 @@ export function Lotes({ token, alVencer, alAbrirInventario }: Props) {
               <tbody>
                 {lotes.map((l) => (
                   <tr key={l.id}>
-                    <td className="mono">{l.numero}</td>
+                    <td className="mono">{numeroLote(l.numero)}</td>
                     <td>{l.patrocinante ?? "—"}</td>
                     <td>
                       <span className="pastilla pastilla--neutro">{l.origen}</span>

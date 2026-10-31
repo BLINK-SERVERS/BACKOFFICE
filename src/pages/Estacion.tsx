@@ -26,7 +26,9 @@ interface Siguiente {
 // nube entrega el siguiente serial del lote y el ESP32 graba el chip.
 // Cada ENROLADA se registra sola y arma de inmediato la tarjeta siguiente.
 
-const sinEnrolar = (l: LoteResumen) => Math.max(0, l.cantidad - l.enroladas);
+// El lote ya entrega el pendiente exacto: las mermas (SCRAP) nunca se
+// enrolan y no deben contarse como trabajo pendiente.
+const sinEnrolar = (l: LoteResumen) => Math.max(0, l.sinEnrolar);
 
 export function Estacion({ token, alVencer }: Props) {
   const [lotes, setLotes] = useState<LoteResumen[]>([]);
@@ -308,7 +310,7 @@ export function Estacion({ token, alVencer }: Props) {
               { valor: "", texto: "Cualquier lote" },
               ...lotes.map((l) => ({
                 valor: l.id,
-                texto: `${l.numero} · ${entero(sinEnrolar(l))} sin enrolar`,
+                texto: `${String(l.numero).padStart(5, "0")} · ${entero(sinEnrolar(l))} sin enrolar`,
               })),
             ]}
           />
@@ -338,7 +340,7 @@ export function Estacion({ token, alVencer }: Props) {
             <span className="punto punto--vivo" aria-hidden="true" />
             <span style={{ flex: 1 }}>
               Siguiente: <span className="mono">{siguiente.serial}</span> · tarifa{" "}
-              {siguiente.tarifa} · acerca la tarjeta
+              {siguiente.tarifa === 2 ? "E" : "G"} · acerca la tarjeta
             </span>
           </div>
         ) : null}

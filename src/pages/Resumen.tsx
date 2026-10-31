@@ -56,7 +56,20 @@ export function Resumen({ token, alVencer }: Props) {
               <Metrica etiqueta="Activas" valor={entero(datos.tarjetas.activas)} />
               <Metrica etiqueta="Asignadas" valor={entero(datos.tarjetas.asignadas)} />
               <Metrica etiqueta="Sin enrolar" valor={entero(datos.tarjetas.sinEnrolar)} />
+              <Metrica etiqueta="Mermas (SCRAP)" valor={entero(datos.tarjetas.desechadas)} />
               <Metrica etiqueta="Saldo en circulación" valor={bs(datos.tarjetas.saldoTotal)} />
+            </div>
+          </section>
+
+          <section className="seccion">
+            <h2>Mermas</h2>
+            <p className="seccion__nota">
+              Rechazos de fábrica y fallas de grabado registrados en la bitácora.
+            </p>
+            <div className="rejilla">
+              <Metrica etiqueta="Total" valor={entero(datos.mermas.total)} />
+              <Metrica etiqueta="Defecto físico (RFPGC)" valor={entero(datos.mermas.fabricante)} />
+              <Metrica etiqueta="Error de grabado (CHIP_ERR)" valor={entero(datos.mermas.grabado)} />
             </div>
           </section>
 

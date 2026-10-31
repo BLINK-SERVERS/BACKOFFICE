@@ -1,6 +1,7 @@
+// El sistema no usa decimales: todo importe es un entero de bolívares.
 const MONEDA = new Intl.NumberFormat("es-VE", {
-  minimumFractionDigits: 2,
-  maximumFractionDigits: 2,
+  minimumFractionDigits: 0,
+  maximumFractionDigits: 0,
 });
 
 export function bs(monto: number | null | undefined): string {

@@ -5,20 +5,18 @@ import { Resumen } from "./pages/Resumen";
 import { Lotes } from "./pages/Lotes";
 import { Inventario } from "./pages/Inventario";
 import { Estacion } from "./pages/Estacion";
-import { Taquilla } from "./pages/Taquilla";
 import { Marca } from "./components/Marca";
 import { Aviso } from "./components/Aviso";
 import { nubeConfigurada } from "./lib/api";
 import { borrarSesion, leerSesion, guardarSesion, type SesionGuardada } from "./lib/sesion";
 
-type Vista = "resumen" | "lotes" | "inventario" | "estacion" | "taquilla";
+type Vista = "resumen" | "lotes" | "inventario" | "estacion";
 
 const MENU: { clave: Vista; texto: string; icono: string }[] = [
   { clave: "resumen", texto: "Resumen", icono: "▤" },
   { clave: "lotes", texto: "Lotes", icono: "▦" },
   { clave: "inventario", texto: "Inventario", icono: "☰" },
   { clave: "estacion", texto: "Estación", icono: "⌁" },
-  { clave: "taquilla", texto: "Taquilla", icono: "◫" },
 ];
 
 export default function App() {
@@ -122,7 +120,6 @@ export default function App() {
           <Inventario token={sesion.token} alVencer={salir} loteInicial={loteInventario} />
         ) : null}
         {vista === "estacion" ? <Estacion token={sesion.token} alVencer={salir} /> : null}
-        {vista === "taquilla" ? <Taquilla token={sesion.token} alVencer={salir} /> : null}
       </main>
     </div>
   );

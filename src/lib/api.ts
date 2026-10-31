@@ -4,8 +4,8 @@ import type {
   Entrada,
   EstadoAdmin,
   LoteCreado,
-  ResultadoAsignacion,
   ResultadoEnrolado,
+  ResultadoMerma,
 } from "./tipos";
 
 export type {
@@ -14,8 +14,8 @@ export type {
   Entrada,
   EstadoAdmin,
   LoteCreado,
-  ResultadoAsignacion,
   ResultadoEnrolado,
+  ResultadoMerma,
 };
 
 // Cliente REST mínimo sobre PostgREST. Igual que en el portal del
@@ -192,11 +192,12 @@ export const api = {
     });
   },
 
-  asignar(token: string, serial: string, cedula: string) {
-    return rpc<ResultadoAsignacion>("bt_admin_asignar", {
+  merma(token: string, serial: string, tipo: "RFPGC" | "CHIP_ERR", motivo = "") {
+    return rpc<ResultadoMerma>("bt_admin_merma", {
       p_token: token,
       p_serial: serial,
-      p_cedula: cedula,
+      p_tipo: tipo,
+      p_motivo: motivo,
     });
   },
 
@@ -224,7 +225,7 @@ export const api = {
 
 export interface LoteResumen {
   id: string;
-  numero: string;
+  numero: number;
   patrocinante: string | null;
   cantidad: number;
   origen: string;
@@ -232,6 +233,8 @@ export interface LoteResumen {
   enroladas: number;
   asignadas: number;
   fabricadas: number;
+  desechadas: number;
+  sinEnrolar: number;
 }
 
 export interface SiguienteSerial {
@@ -258,16 +261,19 @@ export interface Inventario {
   tarjetas: TarjetaInventario[];
 }
 
-export interface ResumenOperativo {  tarjetas: {
+export interface ResumenOperativo {
+  tarjetas: {
     total: number;
     fabricadas: number;
     activas: number;
     bloqueadas: number;
     perdidas: number;
+    desechadas: number;
     asignadas: number;
     sinEnrolar: number;
     saldoTotal: number;
   };
+  mermas: { total: number; fabricante: number; grabado: number };
   recargas: { pendientes: number; montoPendiente: number; porSincronizar: number };
   hoy: { pasajes: number; recaudado: number; porLiquidar: number };
   flota: { unidades: number; rutas: number };

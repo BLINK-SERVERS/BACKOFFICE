@@ -3,8 +3,8 @@
 //   READY,BLINK,5,<pendientes>,<log>
 //   CARD,3981BF06
 //   PONG
-//   ENROLAR_LISTO,serial=23-1-0000001-9,uid=cualquiera
-//   ENROLADA,serial=23-1-0000001-9,uid=3981BF06
+//   ENROLAR_LISTO,serial=G-00001-001-N,uid=cualquiera
+//   ENROLADA,serial=G-00001-001-N,uid=3981BF06
 //   ENROLAR_TIMEUP
 //   ERROR,enrolado,<motivo>
 //   TAP,ok=0,motivo=no-enrolada,uid=...,serial=

@@ -20,6 +20,12 @@ export function Inventario({ token, alVencer, loteInicial }: Props) {
   const [error, setError] = useState("");
   const [cargando, setCargando] = useState(false);
 
+  const [mermaSerial, setMermaSerial] = useState("");
+  const [mermaTipo, setMermaTipo] = useState<"RFPGC" | "CHIP_ERR">("RFPGC");
+  const [mermaMotivo, setMermaMotivo] = useState("");
+  const [mermaAviso, setMermaAviso] = useState("");
+  const [mermando, setMermando] = useState(false);
+
   const consultar = useCallback(
     async (filtros: { lote: string; buscar: string; estado: string }) => {
       setCargando(true);
@@ -57,8 +63,11 @@ export function Inventario({ token, alVencer, loteInicial }: Props) {
     // El texto se aplica con el botón Buscar; el lote y el estado, al cambiar.
   }, [lote, estado, buscarAplicado, consultar]);
 
-  const numeroLote = (id: string | null) =>
-    id ? (lotes.find((l) => l.id === id)?.numero ?? id.slice(0, 8)) : "—";
+  const numeroLote = (id: string | null) => {
+    if (!id) return "—";
+    const encontrado = lotes.find((l) => l.id === id);
+    return encontrado ? String(encontrado.numero).padStart(5, "0") : id.slice(0, 8);
+  };
 
   const exportar = () => {
     if (!datos) return;
@@ -75,6 +84,30 @@ export function Inventario({ token, alVencer, loteInicial }: Props) {
         fecha(t.asignada),
       ]),
     ]);
+  };
+
+  const registrarMerma = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setMermaAviso("");
+    const serial = mermaSerial.trim().toUpperCase();
+    if (!serial) {
+      setMermaAviso("Escribe el serial de la tarjeta defectuosa.");
+      return;
+    }
+    setMermando(true);
+    try {
+      const r = await api.merma(token, serial, mermaTipo, mermaMotivo.trim());
+      setMermaAviso(`${r.serial} pasó a ${r.estado} (${r.tipo}).`);
+      setMermaSerial("");
+      setMermaMotivo("");
+      await consultar({ lote, buscar: buscarAplicado, estado });
+    } catch (fallo) {
+      const err = fallo as ErrorBlink;
+      if (err.codigo === "sesion") return alVencer();
+      setMermaAviso(err.message);
+    } finally {
+      setMermando(false);
+    }
   };
 
   return (
@@ -102,7 +135,7 @@ export function Inventario({ token, alVencer, loteInicial }: Props) {
               { valor: "", texto: "Todos los lotes" },
               ...lotes.map((l) => ({
                 valor: l.id,
-                texto: `${l.numero} · ${entero(l.cantidad)} tarjetas`,
+                texto: `${String(l.numero).padStart(5, "0")} · ${entero(l.cantidad)} tarjetas`,
               })),
             ]}
           />
@@ -124,6 +157,7 @@ export function Inventario({ token, alVencer, loteInicial }: Props) {
               { valor: "ACTIVE", texto: "Activa" },
               { valor: "BLOCKED", texto: "Bloqueada" },
               { valor: "LOST", texto: "Perdida" },
+              { valor: "SCRAP", texto: "Merma (SCRAP)" },
             ]}
           />
         </div>
@@ -176,7 +210,7 @@ export function Inventario({ token, alVencer, loteInicial }: Props) {
                         className={
                           t.estado === "ACTIVE"
                             ? "pastilla pastilla--verde"
-                            : t.estado === "LOST" || t.estado === "BLOCKED"
+                            : t.estado === "LOST" || t.estado === "BLOCKED" || t.estado === "SCRAP"
                               ? "pastilla pastilla--rojo"
                               : "pastilla pastilla--neutro"
                         }
@@ -197,6 +231,48 @@ export function Inventario({ token, alVencer, loteInicial }: Props) {
             </table>
           </div>
         )}
+      </section>
+
+      <section className="seccion">
+        <h2>Registrar merma</h2>
+        <p className="seccion__nota">
+          Saca del inventario un plástico que aún no está vinculado. Queda archivado como
+          RFPGC (defecto de fábrica) o CHIP_ERR (falló el grabado en la estación).
+        </p>
+        {mermaAviso ? <Aviso tipo="info">{mermaAviso}</Aviso> : null}
+        <form onSubmit={registrarMerma}>
+          <div className="fila-campos">
+            <Campo
+              id="merma-serial"
+              etiqueta="Serial"
+              valor={mermaSerial}
+              onChange={setMermaSerial}
+              placeholder="G-00001-001-N"
+            />
+            <Selector
+              id="merma-tipo"
+              etiqueta="Tipo"
+              valor={mermaTipo}
+              onChange={(v) => setMermaTipo(v as "RFPGC" | "CHIP_ERR")}
+              opciones={[
+                { valor: "RFPGC", texto: "RFPGC · Defecto de fábrica" },
+                { valor: "CHIP_ERR", texto: "CHIP_ERR · Error de grabado" },
+              ]}
+            />
+            <Campo
+              id="merma-motivo"
+              etiqueta="Motivo (opcional)"
+              valor={mermaMotivo}
+              onChange={setMermaMotivo}
+              placeholder="Antena cortada"
+            />
+          </div>
+          <div className="acciones" style={{ marginTop: 8 }}>
+            <button className="boton boton--secundario" type="submit" disabled={mermando}>
+              {mermando ? "Registrando…" : "Registrar merma"}
+            </button>
+          </div>
+        </form>
       </section>
     </>
   );

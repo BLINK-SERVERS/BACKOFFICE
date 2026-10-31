@@ -62,7 +62,7 @@ export function Acceso({ onEntrar }: { onEntrar: (sesion: SesionGuardada) => voi
         <Marca subtitulo="Back-office" />
         <h1 className="titulo-pantalla">Entrar al panel</h1>
         <p className="texto-ayuda">
-          Solo cuentas con rol <strong>Administrador</strong> o <strong>Taquilla</strong>.
+          Solo cuentas con rol <strong>Administrador</strong>.
         </p>
 
         {error ? <Aviso tipo="error">{error}</Aviso> : null}

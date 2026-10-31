@@ -30,7 +30,7 @@ export interface EstadoAdmin {
 
 export interface Lote {
   id: string;
-  numero: string;
+  numero: number;
   patrocinante: string | null;
   cantidad: number;
   origen: string;
@@ -54,7 +54,7 @@ export interface TarjetaCatalogo {
 export interface Catalogo {
   lote: {
     id: string;
-    numero: string;
+    numero: number;
     patrocinante: string | null;
     cantidad: number;
     origen: string;
@@ -70,9 +70,9 @@ export interface ResultadoEnrolado {
   errores: { serial: string; uid: string; motivo: string }[];
 }
 
-export interface ResultadoAsignacion {
-  serial?: string;
-  cedula?: string;
-  titular?: string;
-  [clave: string]: unknown;
+export interface ResultadoMerma {
+  ok: boolean;
+  serial: string;
+  tipo: "RFPGC" | "CHIP_ERR";
+  estado: string;
 }
