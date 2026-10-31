@@ -202,6 +202,10 @@ export const api = {
     return rpc<LoteResumen[]>("bt_admin_lotes", { p_token: token, p_limite: limite });
   },
 
+  siguiente(token: string, lote: string | null) {
+    return rpc<SiguienteSerial>("bt_admin_siguiente", { p_token: token, p_lote: lote });
+  },
+
   tarjetas(
     token: string,
     filtros: { lote?: string | null; buscar?: string; estado?: string | null; limite?: number }
@@ -226,6 +230,13 @@ export interface LoteResumen {
   enroladas: number;
   asignadas: number;
   fabricadas: number;
+}
+
+export interface SiguienteSerial {
+  fin: boolean;
+  serial?: string;
+  tarifa?: number;
+  lote?: string | null;
 }
 
 export interface TarjetaInventario {
