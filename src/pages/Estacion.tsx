@@ -170,8 +170,26 @@ export function Estacion({ token, alVencer }: Props) {
       lector.current = nuevo;
       setConectado(true);
       setMensajeLector("Lector conectado. Elige el lote y pulsa Iniciar.");
-    } catch {
-      setError("No se pudo abrir el puerto del lector.");
+    } catch (fallo) {
+      const err = fallo as DOMException;
+      const nombre = err?.name ?? "Error";
+      if (nombre === "NotFoundError") {
+        setError(
+          "No se seleccionó ningún puerto. Pulsa Conectar lector y elige el puerto del ESP32 en el diálogo."
+        );
+      } else if (nombre === "SecurityError") {
+        setError(
+          "El navegador bloqueó el acceso al puerto serie. Usa Chrome o Chromium de escritorio sobre HTTPS."
+        );
+      } else if (nombre === "NetworkError" || nombre === "InvalidStateError") {
+        setError(
+          "El puerto está ocupado o no responde. Cierra el monitor serie, Arduino IDE u otra pestaña que lo use y vuelve a intentar."
+        );
+      } else {
+        setError(
+          `No se pudo abrir el puerto del lector (${nombre}${err?.message ? `: ${err.message}` : ""}).`
+        );
+      }
     }
   };
 
