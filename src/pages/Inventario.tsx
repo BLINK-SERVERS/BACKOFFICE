@@ -14,6 +14,7 @@ export function Inventario({ token, alVencer, loteInicial }: Props) {
   const [lotes, setLotes] = useState<LoteResumen[]>([]);
   const [lote, setLote] = useState<string>(loteInicial ?? "");
   const [buscar, setBuscar] = useState("");
+  const [buscarAplicado, setBuscarAplicado] = useState("");
   const [estado, setEstado] = useState("");
   const [datos, setDatos] = useState<Inv | null>(null);
   const [error, setError] = useState("");
@@ -52,9 +53,9 @@ export function Inventario({ token, alVencer, loteInicial }: Props) {
   }, [token, alVencer]);
 
   useEffect(() => {
-    void consultar({ lote, buscar, estado });
+    void consultar({ lote, buscar: buscarAplicado, estado });
     // El texto se aplica con el botón Buscar; el lote y el estado, al cambiar.
-  }, [lote, estado]);
+  }, [lote, estado, buscarAplicado, consultar]);
 
   const numeroLote = (id: string | null) =>
     id ? (lotes.find((l) => l.id === id)?.numero ?? id.slice(0, 8)) : "—";
@@ -129,7 +130,13 @@ export function Inventario({ token, alVencer, loteInicial }: Props) {
         <div className="acciones">
           <button
             className="boton boton--primario"
-            onClick={() => void consultar({ lote, buscar, estado })}
+            onClick={() => {
+              if (buscar === buscarAplicado) {
+                void consultar({ lote, buscar, estado });
+              } else {
+                setBuscarAplicado(buscar);
+              }
+            }}
             disabled={cargando}
           >
             {cargando ? "Buscando…" : "Buscar"}
