@@ -165,6 +165,8 @@ export class LectorSerial {
     } finally {
       lector.releaseLock();
       if (this.lector === lector) this.lector = null;
+      // Si el enlace murió sin que lo pidiéramos, la UI debe enterarse.
+      if (!this.cancelado) this.olvidar();
     }
   }
 
