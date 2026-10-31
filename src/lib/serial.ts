@@ -43,7 +43,8 @@ export function parsearLinea(linea: string): MensajeLector | null {
 
   const [cabecera, ...resto] = texto.split(",");
 
-  if (cabecera === "READY") return { tipo: "listo", version: resto.join(",") };
+  // READY,BLINK,<fw>,<pendientes>,<log>
+  if (cabecera === "READY") return { tipo: "listo", version: (resto[1] ?? "").trim() };
 
   if (cabecera === "CARD") {
     const uid = (resto[0] ?? "").trim().toUpperCase();
@@ -93,16 +94,40 @@ export class LectorSerial {
   private escritor: WritableStreamDefaultWriter<Uint8Array> | null = null;
   private tareaLectura: Promise<void> | null = null;
   private cancelado = false;
+  private alSoltar: (() => void) | null = null;
 
   get conectado() {
     return this.puerto !== null;
   }
 
-  async conectar(alRecibir: (mensaje: MensajeLector) => void): Promise<void> {
+  // Se dispara cuando el cable se suelta o el puerto deja de responder.
+  // A partir de ahí el objeto queda inservible: hay que reconectar.
+  private desconexion = (evento: Event) => {
+    const suelto = (evento as Event & { port?: SerialPort }).port;
+    if (suelto && suelto !== this.puerto) return;
+    this.olvidar();
+  };
+
+  private olvidar() {
+    if (!this.puerto) return;
+    this.puerto = null;
+    this.cancelado = true;
+    navigator.serial.removeEventListener("disconnect", this.desconexion);
+    const aviso = this.alSoltar;
+    this.alSoltar = null;
+    aviso?.();
+  }
+
+  async conectar(
+    alRecibir: (mensaje: MensajeLector) => void,
+    alSoltar?: () => void
+  ): Promise<void> {
     const puerto = await navigator.serial.requestPort();
     await puerto.open({ baudRate: 115200 });
     this.puerto = puerto;
     this.cancelado = false;
+    this.alSoltar = alSoltar ?? null;
+    navigator.serial.addEventListener("disconnect", this.desconexion);
 
     if (puerto.writable) {
       this.escritor = puerto.writable.getWriter();
@@ -143,16 +168,30 @@ export class LectorSerial {
     }
   }
 
-  async comando(linea: string): Promise<void> {
-    await this.escritor?.write(new TextEncoder().encode(`${linea}\n`));
+  async comando(linea: string): Promise<boolean> {
+    if (!this.escritor) return false;
+    try {
+      await this.escritor.write(new TextEncoder().encode(`${linea}\n`));
+      return true;
+    } catch {
+      // Un tirón del cable deja el escritor bloqueado para siempre.
+      this.olvidar();
+      return false;
+    }
   }
 
-  async ping(): Promise<void> {
-    await this.comando("PING");
+  async ping(): Promise<boolean> {
+    return this.comando("PING");
   }
 
   async desconectar(): Promise<void> {
+    const puerto = this.puerto;
+    if (!puerto) return;
+
     this.cancelado = true;
+    navigator.serial.removeEventListener("disconnect", this.desconexion);
+    this.alSoltar = null;
+
     try {
       await this.lector?.cancel();
     } catch {
@@ -168,10 +207,9 @@ export class LectorSerial {
     }
     this.escritor = null;
 
-    const puerto = this.puerto;
     this.puerto = null;
     try {
-      await puerto?.close();
+      await puerto.close();
     } catch {
       /* el dispositivo ya no estaba */
     }

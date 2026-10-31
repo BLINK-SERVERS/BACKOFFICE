@@ -25,6 +25,9 @@ interface Siguiente {
 // La estación no pide serial ni UID a mano: el lector entrega el UID, la
 // nube entrega el siguiente serial del lote y el ESP32 graba el chip.
 // Cada ENROLADA se registra sola y arma de inmediato la tarjeta siguiente.
+
+const sinEnrolar = (l: LoteResumen) => Math.max(0, l.cantidad - l.enroladas);
+
 export function Estacion({ token, alVencer }: Props) {
   const [lotes, setLotes] = useState<LoteResumen[]>([]);
   const [lote, setLote] = useState("");
@@ -139,7 +142,7 @@ export function Estacion({ token, alVencer }: Props) {
       .lotes(token, 60)
       .then((datos) => {
         setLotes(datos);
-        const conPendientes = datos.find((l) => l.fabricadas > 0);
+        const conPendientes = datos.find((l) => sinEnrolar(l) > 0);
         const inicial = conPendientes?.id ?? datos[0]?.id ?? "";
         setLote((actual) => actual || inicial);
         loteRef.current = loteRef.current || inicial;
@@ -166,7 +169,21 @@ export function Estacion({ token, alVencer }: Props) {
     }
     try {
       const nuevo = new LectorSerial();
-      await nuevo.conectar((mensaje) => manejarRef.current(mensaje));
+      await nuevo.conectar(
+        (mensaje) => manejarRef.current(mensaje),
+        () => {
+          // El cable se soltó o el puerto dejó de responder: la secuencia no
+          // puede seguir armando seriales sobre un equipo que ya no escucha.
+          lector.current = null;
+          activoRef.current = false;
+          serialRef.current = null;
+          setConectado(false);
+          setActivo(false);
+          setSiguiente(null);
+          setMensajeLector("Sin lector conectado.");
+          setError("Se perdió la conexión con el lector. Conéctalo de nuevo para continuar.");
+        }
+      );
       lector.current = nuevo;
       setConectado(true);
       setMensajeLector("Lector conectado. Elige el lote y pulsa Iniciar.");
@@ -198,8 +215,9 @@ export function Estacion({ token, alVencer }: Props) {
       await lector.current?.comando("ENROLAR_OFF");
       activoRef.current = false;
       setActivo(false);
-      setSiguiente(null);
     }
+    serialRef.current = null;
+    setSiguiente(null);
     await lector.current?.desconectar();
     lector.current = null;
     setConectado(false);
@@ -290,7 +308,7 @@ export function Estacion({ token, alVencer }: Props) {
               { valor: "", texto: "Cualquier lote" },
               ...lotes.map((l) => ({
                 valor: l.id,
-                texto: `${l.numero} · ${entero(l.fabricadas)} sin enrolar`,
+                texto: `${l.numero} · ${entero(sinEnrolar(l))} sin enrolar`,
               })),
             ]}
           />
