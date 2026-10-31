@@ -39,6 +39,7 @@ export type CodigoError =
   | "permiso"
   | "datos"
   | "sin-tarjeta"
+  | "sin-enrolar"
   | "sin-cuenta"
   | "bloqueada"
   | "duplicada"
@@ -52,6 +53,7 @@ const CODIGOS: CodigoError[] = [
   "permiso",
   "datos",
   "sin-tarjeta",
+  "sin-enrolar",
   "sin-cuenta",
   "bloqueada",
   "duplicada",
