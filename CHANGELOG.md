@@ -5,6 +5,17 @@ Todos los cambios notables de este repositorio se documentan aquí.
 El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y
 el versionado [SemVer](https://semver.org/lang/es/).
 
+## [No publicado]
+
+### Documentación
+
+- La consola ya no incluye taquilla: el alta de una tarjeta a nombre de un
+  pasajero se hace reclamando el serial desde el portal.
+- README alineado con el alcance vigente (TARJETA + back-office), las
+  migraciones `0001`–`0016` y la simulación local (`../simulacion`).
+- BLINK PASAJES se retiró; su dominio redirige a TARJETA mediante
+  `PASAJES-REDIRECT`.
+
 ## [1.1.0] — 2026-10-30
 
 ### Cambiado
