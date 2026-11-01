@@ -1,8 +1,8 @@
 # BLINK BACK-OFFICE
 
-Consola corporativa de BLINK: emisión de lotes de tarjetas y estación de
-asignación física (ESP32 + lector RFID). Es una
-aplicación **separada** del portal del pasajero ([BLINK
+Consola corporativa de BLINK: emisión de lotes de tarjetas, estación de
+enrolado física (ESP32 + lector RFID) y bandeja de recargas por Pago Móvil. Es
+una aplicación **separada** del portal del pasajero ([BLINK
 TARJETA](https://github.com/BLINK-SERVERS/TARJETA)) y del punto de venta, pero
 ambas hablan con la misma base central de Postgres por TLS.
 
@@ -13,6 +13,7 @@ Publicada en: <https://blink-servers.github.io/BACKOFFICE/>
 | Módulo | Función |
 | --- | --- |
 | **Resumen** | Inventario, recargas pendientes, recaudación del día y flota. |
+| **Recargas** | Revisa los Pago Móvil pendientes y los aprueba o rechaza con confirmación. |
 | **Lotes** | Fase 1 del aprovisionamiento: genera N tarjetas en estado `FABRICADA` con serial Luhn. |
 | **Inventario** | Busca cualquier tarjeta por serial, UID, nombre o cédula; exporta CSV. |
 | **Estación** | Lee el UID con el ESP32, lo empareja con el serial del lote y lo sube a la base. |
@@ -20,16 +21,18 @@ Publicada en: <https://blink-servers.github.io/BACKOFFICE/>
 ## Modelo de seguridad
 
 - **Sin `service_role` en el navegador.** El back-office solo llama funciones
-  `bt_admin_*` (migración `0007`), que reciben el token de la sesión y lo
-  validan en Postgres antes de delegar en las funciones de aprovisionamiento.
-  Esas funciones crudas (`bt_generar_lote`, `bt_estacion_enrolar`,
-  `bt_estacion_asignar`, `bt_resumen_operativo`) están cerradas para `anon`.
+  `bt_admin_*` (migraciones `0007`, `0008` y `0018`), que reciben el token de la
+  sesión y lo validan en Postgres antes de delegar en las funciones de
+  aprovisionamiento. Esas funciones crudas (`bt_generar_lote`,
+  `bt_estacion_enrolar`, `bt_estacion_asignar`, `bt_resumen_operativo`,
+  `bt_recargas_pendientes`, `bt_aprobar_recarga`, `bt_rechazar_recarga`) están
+  cerradas para `anon`.
 - **RBAC.** Solo las cuentas con rol `ADMIN` o `TAQUILLA` pueden iniciar sesión;
   un pasajero recibe `permiso` aunque su PIN sea correcto.
 - **Segundo factor (TOTP RFC 6238).** Se verifica en el servidor
   (`extensions.hmac` + SHA-1, ventana de ±30 s). El secreto sale una sola vez,
   al inscribir el dispositivo, y nunca se guarda en el cliente. Sin el segundo
-  factor activo, las operaciones de inventario se rechazan con `bt:mfa`.
+  factor activo, las operaciones del panel se rechazan con `bt:mfa`.
 - **Sesión.** Un `uuid` en `account_sessions` con caducidad de 12 h, guardado en
   `sessionStorage` (se borra al cerrar la pestaña).
 - **PIN.** 6 dígitos, verificado con bcrypt en el servidor; 5 fallos bloquean la
@@ -95,10 +98,10 @@ BLINK-BACKOFFICE (panel)  ─┼─→  Postgres central (Supabase, TLS)
 BLINK POS (comercio)      ─┘
 ```
 
-El esquema y las migraciones (`0001`–`0016`) viven en
+El esquema y las migraciones (`0001`–`0018`) viven en
 [BLINK-SERVERS/TARJETA](https://github.com/BLINK-SERVERS/TARJETA/tree/main/supabase/migrations);
 este repositorio solo consume las RPC. La documentación ISO del ecosistema
-(BLINK-DOC-00 … 14) está en `TARJETA/docs/`. BLINK PASAJES está retirado: su
+(BLINK-DOC-00 … 18) está en `TARJETA/docs/`. BLINK PASAJES está retirado: su
 dominio redirige a TARJETA mediante `PASAJES-REDIRECT`.
 
 ## Estructura
@@ -108,6 +111,6 @@ src/
   lib/api.ts      Cliente REST de las RPC bt_admin_*
   lib/serial.ts   Protocolo del lector (Web Serial)
   lib/sesion.ts   Token en sessionStorage
-  pages/          Acceso, MFA, Resumen, Lotes, Inventario, Estación
+  pages/          Acceso, MFA, Resumen, Recargas, Lotes, Inventario, Estación
   styles/         Tokens de marca BLINK + consola de escritorio
 ```

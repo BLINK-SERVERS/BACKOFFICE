@@ -221,6 +221,27 @@ export const api = {
       p_limite: filtros.limite ?? 200,
     });
   },
+
+  recargas(token: string, limite = 100) {
+    return rpc<BandejaRecargas>("bt_admin_recargas", {
+      p_token: token,
+      p_limite: limite,
+    });
+  },
+
+  resolverRecarga(
+    token: string,
+    recarga: string,
+    aprobar: boolean,
+    motivo = ""
+  ) {
+    return rpc<ResolucionRecarga>("bt_admin_resolver_recarga", {
+      p_token: token,
+      p_recarga: recarga,
+      p_aprobar: aprobar,
+      p_motivo: aprobar ? null : motivo.trim() || null,
+    });
+  },
 };
 
 export interface LoteResumen {
@@ -259,6 +280,36 @@ export interface TarjetaInventario {
 export interface Inventario {
   total: number;
   tarjetas: TarjetaInventario[];
+}
+
+export interface RecargaPendiente {
+  recarga: string;
+  movimiento: string | null;
+  serial: string;
+  titular: string;
+  cedula: string;
+  monto: number;
+  telefono: string;
+  banco: string;
+  referencia: string;
+  estado: string;
+  reportada: string;
+  saldo: number;
+}
+
+export interface BandejaRecargas {
+  total: number;
+  monto: number;
+  recargas: RecargaPendiente[];
+  operador: string;
+}
+
+export interface ResolucionRecarga {
+  ok: boolean;
+  recarga: string;
+  aprobada: boolean;
+  operador: string;
+  saldo?: number;
 }
 
 export interface ResumenOperativo {

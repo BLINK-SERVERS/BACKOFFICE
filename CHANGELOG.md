@@ -12,9 +12,23 @@ el versionado [SemVer](https://semver.org/lang/es/).
 - La consola ya no incluye taquilla: el alta de una tarjeta a nombre de un
   pasajero se hace reclamando el serial desde el portal.
 - README alineado con el alcance vigente (TARJETA + back-office), las
-  migraciones `0001`–`0016` y la simulación local (`../simulacion`).
+  migraciones `0001`–`0018` y la simulación local (`../simulacion`).
 - BLINK PASAJES se retiró; su dominio redirige a TARJETA mediante
   `PASAJES-REDIRECT`.
+
+## [1.2.0] — 2026-11-01
+
+### Añadido
+
+- **Bandeja de recargas.** Nueva sección **Recargas** con el total pendiente y
+  el monto en revisión, la lista del más antiguo al más reciente (reporte,
+  tarjeta, titular, monto, banco, referencia, teléfono y saldo actual) y las
+  acciones **Aprobar** y **Rechazar**. Aprobar abre una confirmación que avisa
+  que es irreversible; rechazar exige un motivo. El panel refresca la bandeja
+  después de cada resolución.
+- Consume `bt_admin_recargas` y `bt_admin_resolver_recarga` (migración `0018`),
+  que validan sesión y TOTP, bloquean la fila y delegan en las funciones de
+  recarga existentes. Un operador sin segundo factor recibe `bt:mfa`.
 
 ## [1.1.0] — 2026-10-30
 

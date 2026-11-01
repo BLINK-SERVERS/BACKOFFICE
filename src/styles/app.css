@@ -180,6 +180,15 @@
 
 .boton--fantasma:hover { background: var(--color-accent-soft); }
 
+.boton--peligro {
+  background: var(--color-danger-soft);
+  color: var(--color-danger-soft-text);
+}
+
+.boton--peligro:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--color-danger-soft) 70%, var(--color-danger-text));
+}
+
 /* --- Avisos --- */
 .aviso {
   display: flex;
@@ -401,6 +410,32 @@ table.tabla {
 }
 
 .tabla tbody tr:last-child td { border-bottom: 0; }
+
+.recarga__titular {
+  margin-top: 2px;
+  font-size: var(--fs-xs);
+  color: var(--color-text-secondary);
+}
+
+.recarga__monto { font-weight: 700; }
+
+.recarga__acciones {
+  display: flex;
+  gap: 2px;
+  align-items: center;
+}
+
+.recarga__rechazar { color: var(--color-danger-text); }
+
+.recarga__pie {
+  margin-top: 12px;
+  margin-bottom: 0;
+}
+
+.seccion--confirmacion {
+  border-color: var(--color-border-strong);
+  box-shadow: 0 0 0 3px var(--color-accent-soft);
+}
 
 .mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
 

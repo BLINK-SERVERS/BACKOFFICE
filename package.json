@@ -1,9 +1,9 @@
 {
   "name": "blink-backoffice",
   "private": true,
-  "version": "1.1.0",
+  "version": "1.2.0",
   "type": "module",
-  "description": "BLINK BACK-OFFICE — consola corporativa de lotes, estación de asignación y taquilla.",
+  "description": "BLINK BACK-OFFICE — consola corporativa de lotes, estación de enrolado y bandeja de recargas.",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
