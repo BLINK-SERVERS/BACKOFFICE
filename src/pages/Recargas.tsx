@@ -73,11 +73,16 @@ export function Recargas({ token, alVencer }: Props) {
         aprobar,
         motivo
       );
-      const saldo = resultado.saldo ?? recarga.saldo + recarga.monto;
+      const saldo = resultado.saldo ?? recarga.saldo + recarga.montoBase;
+      const detalle = recarga.pasajes
+        ? `${recarga.pasajes} ${recarga.pasajes === 1 ? "pasaje" : "pasajes"} por ${bs(
+            recarga.monto
+          )}, acreditando ${bs(resultado.acreditado ?? recarga.montoBase)}`
+        : `${bs(recarga.monto)}`;
       setAviso(
         aprobar
-          ? `Recarga de ${bs(recarga.monto)} aprobada. Saldo nuevo de la tarjeta: ${bs(saldo)}.`
-          : `Recarga de ${bs(recarga.monto)} rechazada. El saldo no cambió.`
+          ? `Recarga aprobada: ${detalle}. Saldo nuevo de la tarjeta: ${bs(saldo)}.`
+          : `Recarga rechazada: ${detalle}. El saldo no cambió.`
       );
       setConfirmacion(null);
       setMotivo("");
@@ -126,14 +131,21 @@ export function Recargas({ token, alVencer }: Props) {
             {confirmacion.aprobar ? "Aprobar recarga" : "Rechazar recarga"}
           </h2>
           <p className="seccion__nota">
-            {bs(confirmacion.recarga.monto)} · {confirmacion.recarga.serial} ·{" "}
-            {confirmacion.recarga.titular}
+            {confirmacion.recarga.pasajes
+              ? `${confirmacion.recarga.pasajes} ${
+                  confirmacion.recarga.pasajes === 1 ? "pasaje" : "pasajes"
+                } · transfirió ${bs(confirmacion.recarga.monto)} · acredita ${bs(
+                  confirmacion.recarga.montoBase
+                )}`
+              : `${bs(confirmacion.recarga.monto)} (recarga sin desglose de pasajes)`}
+            {" · "}
+            {confirmacion.recarga.serial} · {confirmacion.recarga.titular}
           </p>
           {confirmacion.aprobar ? (
             <Aviso tipo="aviso">
-              Aprobar es irreversible: el saldo virtual sube ahora y el chip lo recibe en la
-              próxima sincronización del validador. Verifica antes en el banco que coincidan
-              monto, banco, teléfono y los últimos 4 dígitos de la referencia.
+              Aprobar es irreversible: el saldo virtual sube {bs(confirmacion.recarga.montoBase)} ahora y
+              el chip lo recibe en la próxima sincronización del validador. Verifica antes en el
+              banco que coincidan monto, banco, teléfono y los últimos 4 dígitos de la referencia.
             </Aviso>
           ) : (
             <Campo
@@ -180,8 +192,16 @@ export function Recargas({ token, alVencer }: Props) {
             <div className="metrica__valor">{entero(total)}</div>
           </div>
           <div className="metrica">
-            <div className="metrica__etiqueta">Monto pendiente</div>
+            <div className="metrica__etiqueta">Monto por conciliar</div>
             <div className="metrica__valor">{bs(datos?.monto ?? 0)}</div>
+          </div>
+          <div className="metrica">
+            <div className="metrica__etiqueta">A acreditar</div>
+            <div className="metrica__valor">{bs(datos?.base ?? 0)}</div>
+          </div>
+          <div className="metrica">
+            <div className="metrica__etiqueta">Pasajes</div>
+            <div className="metrica__valor">{entero(datos?.pasajes ?? 0)}</div>
           </div>
         </div>
       </section>
@@ -202,7 +222,8 @@ export function Recargas({ token, alVencer }: Props) {
                   <tr>
                     <th>Reportada</th>
                     <th>Tarjeta</th>
-                    <th>Monto</th>
+                    <th>Pasajes</th>
+                    <th>Transferido</th>
                     <th>Pago Móvil</th>
                     <th>Saldo actual</th>
                     <th>Acciones</th>
@@ -219,7 +240,16 @@ export function Recargas({ token, alVencer }: Props) {
                           {r.cedula ? <span className="campo__pista"> · {r.cedula}</span> : null}
                         </div>
                       </td>
-                      <td className="mono recarga__monto">{bs(r.monto)}</td>
+                      <td className="mono">
+                        {r.pasajes ?? "—"}
+                        {r.tarifaBase ? (
+                          <div className="campo__pista">a {bs(r.tarifaBase)}</div>
+                        ) : null}
+                      </td>
+                      <td className="mono recarga__monto">
+                        {bs(r.monto)}
+                        <div className="campo__pista">acredita {bs(r.montoBase)}</div>
+                      </td>
                       <td>
                         <div>{r.banco}</div>
                         <div className="campo__pista">

@@ -98,7 +98,7 @@ BLINK-BACKOFFICE (panel)  ─┼─→  Postgres central (Supabase, TLS)
 BLINK POS (comercio)      ─┘
 ```
 
-El esquema y las migraciones (`0001`–`0018`) viven en
+El esquema y las migraciones (`0001`–`0020`) viven en
 [BLINK-SERVERS/TARJETA](https://github.com/BLINK-SERVERS/TARJETA/tree/main/supabase/migrations);
 este repositorio solo consume las RPC. La documentación ISO del ecosistema
 (BLINK-DOC-00 … 18) está en `TARJETA/docs/`. BLINK PASAJES está retirado: su

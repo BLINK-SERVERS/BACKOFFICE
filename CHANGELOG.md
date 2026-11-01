@@ -7,12 +7,25 @@ el versionado [SemVer](https://semver.org/lang/es/).
 
 ## [No publicado]
 
+## [1.3.0] — 2026-11-01
+
+### Añadido
+
+- **Desglose de pasajes en la bandeja de recargas.** Cada fila muestra cuántos
+  pasajes se compraron, su tarifa, el monto transferido y la línea «acredita»
+  con el monto base. Las métricas pasan a **Pendientes**, **Monto por
+  conciliar** (bruto), **A acreditar** (monto base) y **Pasajes**.
+- La confirmación de aprobación resume «N pasajes · transfirió Bs … · acredita
+  Bs …» y el aviso final informa el saldo nuevo.
+- Compatible con recargas anteriores a `0019`: muestran «—» en pasajes y
+  acreditan su importe original.
+
 ### Documentación
 
 - La consola ya no incluye taquilla: el alta de una tarjeta a nombre de un
   pasajero se hace reclamando el serial desde el portal.
 - README alineado con el alcance vigente (TARJETA + back-office), las
-  migraciones `0001`–`0018` y la simulación local (`../simulacion`).
+  migraciones `0001`–`0020` y la simulación local (`../simulacion`).
 - BLINK PASAJES se retiró; su dominio redirige a TARJETA mediante
   `PASAJES-REDIRECT`.
 

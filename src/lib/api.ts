@@ -288,7 +288,13 @@ export interface RecargaPendiente {
   serial: string;
   titular: string;
   cedula: string;
+  /** Monto bruto transferido por Pago Móvil. */
   monto: number;
+  /** Bs que se acreditan a la tarjeta (N × tarifa). */
+  montoBase: number;
+  /** NULL en recargas anteriores a la migración 0019. */
+  pasajes: number | null;
+  tarifaBase: number | null;
   telefono: string;
   banco: string;
   referencia: string;
@@ -300,6 +306,9 @@ export interface RecargaPendiente {
 export interface BandejaRecargas {
   total: number;
   monto: number;
+  /** Total de Bs que se acreditarán al aprobar la bandeja. */
+  base: number;
+  pasajes: number;
   recargas: RecargaPendiente[];
   operador: string;
 }
@@ -310,6 +319,8 @@ export interface ResolucionRecarga {
   aprobada: boolean;
   operador: string;
   saldo?: number;
+  acreditado?: number;
+  pasajes?: number | null;
 }
 
 export interface ResumenOperativo {
