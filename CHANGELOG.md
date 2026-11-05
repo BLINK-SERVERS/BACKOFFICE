@@ -7,6 +7,15 @@ el versionado [SemVer](https://semver.org/lang/es/).
 
 ## [No publicado]
 
+### Corregido
+
+- **Carrera al detener la estación de enrolado** (`src/pages/Estacion.tsx`).
+  Si el operador pulsaba *Detener* o desconectaba el cable mientras la nube
+  buscaba el siguiente serial, la respuesta rearmaba la escritura y el ESP32
+  seguía grabando tarjetas con la interfaz diciendo «secuencia detenida». Ahora
+  `activoRef` se marca en falso **antes** de mandar `ENROLAR_OFF` y se
+  comprueba de nuevo al regresar la respuesta (B-69, BLINK-DOC-09).
+
 ## [1.3.0] — 2026-11-01
 
 ### Añadido

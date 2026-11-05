@@ -65,6 +65,10 @@ export function Estacion({ token, alVencer }: Props) {
     if (!activoRef.current || !lector.current) return;
     try {
       const sig: SiguienteSerial = await api.siguiente(token, loteRef.current || null);
+      // El operador pudo pulsar Detener (o soltar el cable) mientras la nube
+      // respondía. Rearmar aquí dejaría el ESP32 grabando tarjetas a espaldas
+      // de una interfaz que ya dice «secuencia detenida».
+      if (!activoRef.current || !lector.current) return;
       if (sig.fin || !sig.serial) {
         detener("Lote completo: no quedan tarjetas sin enrolar.", false);
         return;
@@ -214,8 +218,10 @@ export function Estacion({ token, alVencer }: Props) {
 
   const desconectar = async () => {
     if (activoRef.current) {
-      await lector.current?.comando("ENROLAR_OFF");
+      // Igual que en Detener: el paro se marca antes del comando para que un
+      // armarSiguiente() en vuelo no rearne sobre un puerto que se cierra.
       activoRef.current = false;
+      await lector.current?.comando("ENROLAR_OFF");
       setActivo(false);
     }
     serialRef.current = null;
@@ -243,6 +249,10 @@ export function Estacion({ token, alVencer }: Props) {
   };
 
   const detenerManual = async () => {
+    // Se marca el paro antes de hablar con el lector: si hay un armarSiguiente()
+    // en vuelo, al regresar verá que ya no está activo y no rearmará la
+    // estación que el operador acaba de detener.
+    activoRef.current = false;
     await lector.current?.comando("ENROLAR_OFF");
     detener("Secuencia detenida. El equipo ya no graba tarjetas hasta que reanudes.", false);
   };
