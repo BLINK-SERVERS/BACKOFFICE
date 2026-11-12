@@ -25,6 +25,7 @@ export default function App() {
   const [sesion, setSesion] = useState<SesionGuardada | null>(() => leerSesion());
   const [vista, setVista] = useState<Vista>("resumen");
   const [loteInventario, setLoteInventario] = useState<string | null>(null);
+  const [inscribirMfa, setInscribirMfa] = useState(false);
 
   const salir = useCallback(() => {
     borrarSesion();
@@ -62,15 +63,22 @@ export default function App() {
     return <Acceso onEntrar={setSesion} />;
   }
 
-  if (!sesion.mfa) {
+  // Sin segundo factor activo el panel sólo es usable mientras el bypass
+  // administrativo está encendido; `inscribirMfa` permite cerrarlo desde la
+  // propia banda de aviso.
+  if (!sesion.mfa && (!sesion.mfaBypase || inscribirMfa)) {
     return (
       <Mfa
         sesion={sesion}
-        onSalir={salir}
+        onSalir={() => {
+          setInscribirMfa(false);
+          if (!sesion.mfaBypase) salir();
+        }}
         onListo={() => {
-          const actualizada = { ...sesion, mfa: true };
+          const actualizada = { ...sesion, mfa: true, mfaBypase: false };
           guardarSesion(actualizada);
           setSesion(actualizada);
+          setInscribirMfa(false);
         }}
       />
     );
@@ -114,6 +122,14 @@ export default function App() {
       </aside>
 
       <main className="trabajo">
+        {sesion.mfaBypase ? (
+          <Aviso tipo="aviso">
+            El segundo factor está en modo bypass: esta consola la protege solo el PIN.{" "}
+            <button className="boton boton--secundario" onClick={() => setInscribirMfa(true)}>
+              Activar la verificación en dos pasos
+            </button>
+          </Aviso>
+        ) : null}
         {vista === "resumen" ? <Resumen token={sesion.token} alVencer={salir} /> : null}
         {vista === "recargas" ? <Recargas token={sesion.token} alVencer={salir} /> : null}
         {vista === "lotes" ? (

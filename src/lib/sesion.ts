@@ -10,6 +10,8 @@ export interface SesionGuardada {
   token: string;
   rol: Rol;
   mfa: boolean;
+  // Sesión abierta mientras el segundo factor está en bypass (migración 0029).
+  mfaBypase?: boolean;
   cuenta: CuentaAdmin;
 }
 

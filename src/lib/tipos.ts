@@ -18,6 +18,7 @@ export interface Entrada {
   rol: Rol;
   mfa: boolean;
   mfaPendiente: boolean;
+  mfaBypase: boolean;
   cuenta: CuentaAdmin;
 }
 
@@ -25,6 +26,7 @@ export interface EstadoAdmin {
   rol: Rol;
   mfa: boolean;
   mfaPendiente: boolean;
+  mfaBypase: boolean;
   cuenta: CuentaAdmin;
 }
 

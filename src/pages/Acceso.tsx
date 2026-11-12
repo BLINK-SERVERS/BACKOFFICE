@@ -39,6 +39,7 @@ export function Acceso({ onEntrar }: { onEntrar: (sesion: SesionGuardada) => voi
         token: datos.token,
         rol: datos.rol,
         mfa: datos.mfa,
+        mfaBypase: datos.mfaBypase,
         cuenta: datos.cuenta,
       };
       guardarSesion(sesion);

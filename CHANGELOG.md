@@ -7,6 +7,15 @@ el versionado [SemVer](https://semver.org/lang/es/).
 
 ## [No publicado]
 
+### Añadido
+
+- **Aviso cuando el segundo factor está en bypass** (`src/App.tsx`,
+  `src/lib/sesion.ts`). La base (migración 0029 de BLINK PAY) permite operar sin
+  MFA por un tiempo acotado; el panel ya no fuerza la pantalla de inscripción en
+  ese caso y muestra una banda de aviso con un botón para activar la verificación
+  en dos pasos. Sin bypass el comportamiento es el de siempre: no se entra hasta
+  confirmar el segundo factor.
+
 ### Corregido
 
 - **Carrera al detener la estación de enrolado** (`src/pages/Estacion.tsx`).
