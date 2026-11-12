@@ -100,6 +100,12 @@ async function rpc<T>(funcion: string, argumentos: Record<string, unknown>): Pro
         Authorization: `Bearer ${LLAVE}`,
         "Content-Type": "application/json",
         Accept: "application/json",
+        // El API gateway de Supabase dejó de exponer `public` por defecto: sin
+        // estas dos cabeceras toda llamada devuelve PGRST202 (404) y la app
+        // muestra el fallo genérico de red. El validador ya las envía
+        // (firmware/validador/red.cpp).
+        "Accept-Profile": "public",
+        "Content-Profile": "public",
       },
       body: JSON.stringify(argumentos),
     });

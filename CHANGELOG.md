@@ -15,6 +15,14 @@ el versionado [SemVer](https://semver.org/lang/es/).
   seguía grabando tarjetas con la interfaz diciendo «secuencia detenida». Ahora
   `activoRef` se marca en falso **antes** de mandar `ENROLAR_OFF` y se
   comprueba de nuevo al regresar la respuesta (B-69, BLINK-DOC-09).
+- **El back-office no dejaba entrar** (`src/lib/api.ts`). El API gateway de
+  Supabase pasó a exponer por defecto el esquema `api`, vacío en este proyecto,
+  y toda RPC respondía 404 con `PGRST202`; el cliente lo traducía en el aviso
+  genérico «BLINK no está disponible en este momento. Intenta más tarde.» Las
+  llamadas ahora fijan `Accept-Profile` y `Content-Profile` a `public`, como ya
+  hacía el validador. Verificado en navegador el 2026-11-11: el acceso con
+  credenciales reales llega hasta *Verificación en dos pasos* y `bt_admin_resumen`
+  responde con su error de dominio (`bt:mfa`) en lugar del aviso de red.
 
 ## [1.3.0] — 2026-11-01
 
